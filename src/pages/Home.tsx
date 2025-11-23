@@ -2,32 +2,14 @@ import { Link } from "react-router-dom";
 import { UserProfile, AuthLayout, LoadingSpinner } from "../components";
 import { Button } from "../components/ui/button";
 import { authService } from "../services/auth";
-import { useEffect, useState } from "react";
+import { useAuthStatus } from "../hooks/useAuth";
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(
-    null,
-  );
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = authService.isAuthenticated();
-      const userData = authService.getCurrentUser();
-
-      setIsAuthenticated(authenticated);
-      setUser(userData);
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, []);
+  const { user, isAuthenticated, isLoading } = useAuthStatus();
 
   const handleLogout = () => {
     authService.logout();
-    setIsAuthenticated(false);
-    setUser(null);
+    // Force page refresh to clear React Query cache
     window.location.reload();
   };
 

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authService } from "../services/auth";
 import type { RegisterRequest, LoginRequest } from "../types/auth";
 import { toast } from "react-hot-toast";
@@ -27,7 +27,7 @@ export const useRegister = () => {
     onSuccess: (response) => {
       if (response.success) {
         toast.success(response.message || "Registration successful!");
-        queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
       }
     },
     onError: (error: unknown) => {
@@ -59,7 +59,7 @@ export const useLogin = () => {
     onSuccess: (response) => {
       if (response.success) {
         toast.success(response.message || "Login successful!");
-        queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.invalidateQueries({ queryKey: ["user", "profile"] });
       }
     },
     onError: (error: unknown) => {
@@ -81,4 +81,24 @@ export const useLogin = () => {
       }
     },
   });
+};
+
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ["user", "profile"],
+    queryFn: () => authService.getProfile(),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAuthStatus = () => {
+  const { data: user, isLoading, error } = useProfile();
+
+  return {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    isError: !!error,
+  };
 };

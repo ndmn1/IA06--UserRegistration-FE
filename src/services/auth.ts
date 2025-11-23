@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   RegisterResponse,
   LoginResponse,
+  User,
 } from "../types/auth";
 
 export const authService = {
@@ -43,23 +44,33 @@ export const authService = {
     return localStorage.getItem("token");
   },
 
-  isAuthenticated: () => {
+  hasToken: () => {
     return !!localStorage.getItem("token");
   },
 
-  getCurrentUser: () => {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-
+  getProfile: async (): Promise<User | null> => {
     try {
-      // Decode JWT token to get user info (basic implementation)
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return {
-        email: payload.email || payload.sub,
-        name: payload.name,
-      };
-    } catch {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+
+      const response = await apiClient.get("/user/profile");
+      return response.data.user;
+    } catch (error) {
+      console.error("Failed to get user profile:", error);
       return null;
     }
+  },
+
+  getLocalStorageToken: (): string | null => {
+    return localStorage.getItem("token");
+  },
+
+  getCurrentUser: async (): Promise<User | null> => {
+    return await authService.getProfile();
+  },
+
+  isAuthenticated: async (): Promise<boolean> => {
+    const user = await authService.getProfile();
+    return user !== null;
   },
 };

@@ -23,7 +23,7 @@ export function AuthGuard({
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAuthenticated = authService.isAuthenticated();
+    const isAuthenticated = authService.getLocalStorageToken();
 
     // If page requires auth but user is not authenticated
     if (requireAuth && !isAuthenticated) {
