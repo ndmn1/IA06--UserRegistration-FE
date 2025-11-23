@@ -24,7 +24,7 @@ React + TypeScript frontend for user registration and authentication with modern
    Create `.env` file:
 
    ```env
-   API_BASE_URL=http://localhost:3000
+   VITE_API_BASE_URL=http://localhost:3000
    ```
 
 3. **Start development server:**
